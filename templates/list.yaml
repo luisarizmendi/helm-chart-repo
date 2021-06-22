@@ -1,0 +1,149 @@
+{{- if .Values.backend_creation.postgres }}
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    annotations:
+      helm.sh/hook: pre-install
+      template.openshift.io/expose-database_name: {{ .Values.postgres.database_name }}
+      template.openshift.io/expose-password: {{ .Values.postgres.password }}
+      template.openshift.io/expose-username: {{ .Values.postgres.username }}
+    labels:
+      template: postgresql-persistent-template
+    name: {{ .Values.postgres.database_name }}
+  stringData:
+    database-name: {{ .Values.postgres.database_name }}
+    database-password: {{ .Values.postgres.password }}
+    database-user: {{ .Values.postgres.username }}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      helm.sh/hook: pre-install
+      template.openshift.io/expose-uri: postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="{{ .Values.postgres.database_name }}")].port}
+    labels:
+      template: postgresql-persistent-template
+    name: {{ .Values.postgres.database_name }}
+  spec:
+    ports:
+    - name: {{ .Values.postgres.database_name }}
+      nodePort: 0
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+    selector:
+      name: {{ .Values.postgres.database_name }}
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    labels:
+      template: postgresql-persistent-template
+    name: {{ .Values.postgres.database_name }}
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      helm.sh/hook: pre-install
+      template.alpha.openshift.io/wait-for-ready: "true"
+    labels:
+      template: postgresql-persistent-template
+      app.openshift.io/runtime: postgresql
+      app.kubernetes.io/part-of: analysis
+    name: {{ .Values.postgres.database_name }}
+  spec:
+    replicas: 1
+    selector:
+      name: {{ .Values.postgres.database_name }}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          name: {{ .Values.postgres.database_name }}
+      spec:
+        containers:
+        - env:
+          - name: POSTGRESQL_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: {{ .Values.postgres.database_name }}
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: {{ .Values.postgres.database_name }}
+          - name: POSTGRESQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                key: database-name
+                name: {{ .Values.postgres.database_name }}
+          image: ' '
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - /usr/libexec/check-container
+              - --live
+            initialDelaySeconds: 120
+            timeoutSeconds: 10
+          name: {{ .Values.postgres.database_name }}
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /usr/libexec/check-container
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 512Mi
+          securityContext:
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/lib/pgsql/data
+            name: {{ .Values.postgres.database_name }}-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        volumes:
+        - name: {{ .Values.postgres.database_name }}-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.postgres.database_name }}
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - {{ .Values.postgres.database_name }}
+        from:
+          kind: ImageStreamTag
+          name: postgresql:10-el8
+          namespace: openshift
+        lastTriggeredImage: ""
+      type: ImageChange
+    - type: ConfigChange
+kind: List
+metadata:
+  name: postgres-persistent
+  namespace: {{ .Values.project_namespace }}
+  annotations:
+    helm.sh/hook: pre-install
+    meta.helm.sh/release-name: analysis
+    meta.helm.sh/release-namespace: {{ .Values.project_namespace }}
+  labels:
+    app: {{ .Values.postgres.database_name }}
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: analysis
+    release: analysis
+{{- end }}

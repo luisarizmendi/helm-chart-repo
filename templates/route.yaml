@@ -1,0 +1,63 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: analysis-gateway
+  namespace: {{ .Values.project_namespace }}
+  labels:
+    app: analysis-gateway
+    app.kubernetes.io/managed-by: Helm
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  host: analysis-gateway-{{ .Values.project_namespace }}.apps.{{ .Values.domain }}
+  to:
+    kind: Service
+    name: analysis-gateway
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  wildcardPolicy: None
+
+---
+{{- if .Values.backend_creation.postgres }}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: pgweb
+  namespace: {{ .Values.project_namespace }}
+  labels:
+    app: pgweb
+    app.kubernetes.io/component: pgweb
+    app.kubernetes.io/instance: pgweb
+    app.kubernetes.io/part-of: analysis
+    app.openshift.io/runtime-version: latest
+  annotations:
+    app.openshift.io/connects-to: >-
+      [{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"{{ .Values.postgres.database_name }}"}]
+spec:
+  to:
+    kind: Service
+    name: pgweb
+    weight: 100
+  port:
+    targetPort: 8081-tcp
+  wildcardPolicy: None
+{{- end }}
+
+---
+{{- if .Values.backend_creation.kafka }}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  labels:
+    app: kafdrop
+  name: kafdrop
+  namespace: {{ .Values.project_namespace }}
+spec:
+  port:
+    targetPort: 9000-tcp
+  to:
+    kind: Service
+    name: kafdrop
+    weight: 100
+{{- end }}

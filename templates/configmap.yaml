@@ -1,0 +1,49 @@
+{{- if .Values.backend_creation.postgres }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-script
+  namespace: {{ .Values.project_namespace }}
+  annotations:
+    helm.sh/hook: pre-install
+data:
+  pgscript.sh: |-
+    #!/bin/bash#
+    psql -h {{ .Values.postgres.hostname }} -p 5432 -U {{ .Values.postgres.username }} {{ .Values.postgres.database_name }}  -c "CREATE SCHEMA {{ .Values.postgres.schema }} AUTHORIZATION {{ .Values.postgres.username }};"
+    psql -h {{ .Values.postgres.hostname }} -p 5432 -U {{ .Values.postgres.username }} {{ .Values.postgres.database_name }}  -c "alter table if exists {{ .Values.postgres.schema }}.LineItems
+        drop constraint if exists FK6fhxopytha3nnbpbfmpiv4xgn;"
+    psql -h {{ .Values.postgres.hostname }} -p 5432 -U {{ .Values.postgres.username }} {{ .Values.postgres.database_name }}  -c "drop table if exists {{ .Values.postgres.schema }}.LineItems cascade;
+    drop table if exists {{ .Values.postgres.schema }}.Orders cascade;
+    drop table if exists {{ .Values.postgres.schema }}.OutboxEvent cascade;"
+    psql -h {{ .Values.postgres.hostname }} -p 5432 -U {{ .Values.postgres.username }} {{ .Values.postgres.database_name }}  -c "create table {{ .Values.postgres.schema }}.LineItems (
+                              itemId varchar(255) not null,
+                              item varchar(255),
+                              lineItemStatus varchar(255),
+                              name varchar(255),
+                              order_id varchar(255) not null,
+                              primary key (itemId)
+    );"
+
+    psql -h {{ .Values.postgres.hostname }} -p 5432 -U {{ .Values.postgres.username }} {{ .Values.postgres.database_name }}  -c "create table {{ .Values.postgres.schema }}.Orders (
+                            order_id varchar(255) not null,
+                            patientId varchar(255),
+                            orderStatus varchar(255),
+                            timestamp timestamp,
+                            primary key (order_id)
+    );"
+
+    psql -h {{ .Values.postgres.hostname }} -p 5432 -U {{ .Values.postgres.username }} {{ .Values.postgres.database_name }}  -c "create table {{ .Values.postgres.schema }}.OutboxEvent (
+                                id uuid not null,
+                                aggregatetype varchar(255) not null,
+                                aggregateid varchar(255) not null,
+                                type varchar(255) not null,
+                                timestamp timestamp not null,
+                                payload varchar(8000),
+                                primary key (id)
+    );"
+
+    psql -h {{ .Values.postgres.hostname }} -p 5432 -U {{ .Values.postgres.username }} {{ .Values.postgres.database_name }}  -c "alter table if exists {{ .Values.postgres.schema }}.LineItems
+        add constraint FK6fhxopytha3nnbpbfmpiv4xgn
+            foreign key (order_id)
+                references {{ .Values.postgres.schema }}.Orders;"
+{{- end }}

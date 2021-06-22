@@ -1,0 +1,57 @@
+{{- if .Values.backend_creation.kafka }}
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: analysis-events-kafdrop
+  namespace:  {{ .Values.project_namespace }}
+  annotations:
+    app.openshift.io/connects-to: >-
+      [{"apiVersion":"apps/v1","kind":"StatefulSet","name":"{{ .Values.kafka.cluster_name }}-kafka"}]
+    app.openshift.io/vcs-uri: 'https://github.com/obsidiandynamics/kafdrop'
+  labels:
+    app: kafdrop
+    app.kubernetes.io/part-of: analysis
+    app.openshift.io/runtime: amq
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    name: kafdrop
+  template:
+    metadata:
+      name: kafdrop
+      labels:
+        name: kafdrop
+    spec:
+      containers:
+        - name: kafdrop
+          env:
+            - name: KAFKA_BROKERCONNECT
+              value: {{ .Values.kafka.cluster_name }}-kafka-bootstrap:9092
+          imagePullPolicy: IfNotPresent
+          image: obsidiandynamics/kafdrop
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            httpGet:
+              path: /actuator/health
+              port: 9000
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            httpGet:
+              path: /actuator/health
+              port: 9000
+              scheme: HTTP
+  triggers:
+    - type: ConfigChange
+{{- end }}

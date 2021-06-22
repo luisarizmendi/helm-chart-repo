@@ -1,0 +1,215 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analysis-gateway
+  annotations:
+    app.openshift.io/connects-to: >-
+      [{"apiVersion":"apps/v1","kind":"Deployment","name":"analysis-core"}]
+  labels:
+    app: analysis-gateway
+    app.kubernetes.io/part-of: analysis
+    app.openshift.io/runtime: quarkus
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replica_count.gateway }}
+  selector:
+    matchLabels:
+      app: analysis-gateway
+  template:
+    metadata:
+      name: analysis-gateway
+      labels:
+        app: analysis-gateway
+        release: {{ .Release.Name }}
+        app.kubernetes.io/component: analysis-gateway
+        app.kubernetes.io/instance: analysis-gateway
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/part-of: analysis
+        analysis: ""
+        app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+    spec:
+      containers:
+        - name: analysis-gateway
+          image: {{ .Values.registry }}/analysis-gateway:{{ .Values.version.gateway }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_URLS
+              value: {{ .Values.kafka.cluster_name }}-kafka-bootstrap:9092
+            - name: STREAM_URL
+              value:  http://analysis-gateway-{{ .Values.project_namespace }}.apps.{{ .Values.domain }}/dashboard/stream
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analysis-core
+  labels:
+    app: analysis-core
+    app.kubernetes.io/part-of: analysis
+    app.openshift.io/runtime: quarkus
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+  annotations:
+    app.openshift.io/connects-to: >-
+      [{"apiVersion":"apps/v1","kind":"Deployment","name":"analysis-process-virus"},{"apiVersion":"apps/v1","kind":"Deployment","name":"analysis-process-regular"},{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"analysisdb"},{"apiVersion":"apps/v1","kind":"Deployment","name":"analysisdb"}]
+spec:
+  replicas: {{ .Values.replica_count.core }}
+  selector:
+    matchLabels:
+      app: analysis-core
+  template:
+    metadata:
+      name: analysis-core-deployment
+      labels:
+        app:  analysis-core
+        release: {{ .Release.Name }}
+        app.kubernetes.io/component: analysis-core
+        app.kubernetes.io/instance: analysis-core
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/part-of: analysis
+        analysis: ""
+        app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+    spec:
+      containers:
+        - name: analysis-core
+          image: {{ .Values.registry }}/analysis-core:{{ .Values.version.core }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_URLS
+              value: {{ .Values.kafka.cluster_name }}-kafka-bootstrap:9092
+            - name: PGSQL_URL
+              value: jdbc:postgresql://{{ .Values.postgres.hostname }}:5432/{{ .Values.postgres.database_name }}?currentSchema={{ .Values.postgres.schema }}
+            - name: PGSQL_USER
+              value: {{ .Values.postgres.username }}
+            - name: PGSQL_PASS
+              value: {{ .Values.postgres.password }}
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analysis-process-regular
+  labels:
+    app: analysis-process-regular
+    app.kubernetes.io/part-of: analysis
+    app.openshift.io/runtime: quarkus
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replica_count.regular }}
+  selector:
+    matchLabels:
+      app: analysis-process-regular
+  template:
+    metadata:
+      name: analysis-process-regular-deployment
+      labels:
+        app:  analysis-process-regular
+        release: {{ .Release.Name }}
+        app.kubernetes.io/component: analysis-process-regular
+        app.kubernetes.io/instance: analysis-process-regular
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/part-of: analysis
+        analysis: ""
+        app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+    spec:
+      containers:
+        - name: analysis-process-regular
+          image: {{ .Values.registry }}/analysis-process-regular:{{ .Values.version.regular }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8778
+              protocol: TCP
+            - containerPort: 9779
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_URLS
+              value: {{ .Values.kafka.cluster_name }}-kafka-bootstrap:9092
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analysis-process-virus
+  labels:
+    app: analysis-process-virus
+    app.kubernetes.io/part-of: analysis
+    app.openshift.io/runtime: quarkus
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replica_count.virus }}
+  selector:
+    matchLabels:
+      app: analysis-process-virus
+  template:
+    metadata:
+      name: analysis-process-virus-deployment
+      labels:
+        app:  analysis-process-virus
+        release: {{ .Release.Name }}
+        app.kubernetes.io/component: analysis-process-virus
+        app.kubernetes.io/instance: analysis-process-virus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/part-of: analysis
+        analysis: ""
+        app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+    spec:
+      containers:
+        - name: analysis-process-virus
+          image: {{ .Values.registry }}/analysis-process-virus:{{ .Values.version.virus }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_URLS
+              value: {{ .Values.kafka.cluster_name }}-kafka-bootstrap:9092
+
+---
+{{- if .Values.backend_creation.postgres }}
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    app.openshift.io/connects-to: >-
+      [{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"{{ .Values.postgres.database_name }}"}]
+  name: pgweb
+  namespace: {{ .Values.project_namespace }}
+  labels:
+    app: pgweb
+    app.kubernetes.io/component: pgweb
+    app.kubernetes.io/instance: pgweb
+    app.kubernetes.io/part-of: analysis
+    app.openshift.io/runtime: postgresql
+    app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgweb
+  template:
+    metadata:
+      labels:
+        app: pgweb
+        deploymentconfig: pgweb
+    spec:
+      containers:
+        - name: pgweb
+          image: >-
+            sosedoff/pgweb
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+{{- end }}

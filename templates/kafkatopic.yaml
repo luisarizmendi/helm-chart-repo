@@ -1,0 +1,71 @@
+{{- if .Values.backend_creation.kafka }}
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: regularprocess-in
+  labels:
+    strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
+  namespace:  {{ .Values.project_namespace }}
+spec:
+  partitions: 10
+  replicas: 3
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: virusprocess-in
+  labels:
+    strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
+  namespace:  {{ .Values.project_namespace }}
+spec:
+  partitions: 10
+  replicas: 3
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: orders-in
+  labels:
+    strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
+  namespace:  {{ .Values.project_namespace }}
+spec:
+  partitions: 10
+  replicas: 3
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: orders-out
+  labels:
+    strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
+  namespace:  {{ .Values.project_namespace }}
+spec:
+  partitions: 10
+  replicas: 3
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: web-updates
+  labels:
+    strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
+  namespace:  {{ .Values.project_namespace }}
+spec:
+  partitions: 10
+  replicas: 3
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
+{{- end }}

@@ -1,0 +1,67 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "properties": {
+        "project_namespace": {
+            "type": "string",
+            "description": "Namespace where to deploy the app"
+        },
+        "domain": {
+            "type": "string",
+            "description": "OpenShift cluster domain"
+        },
+        "registry": {
+            "type": "string",
+            "description": "Registry where the container images are located"
+        },
+        "postgres": {
+            "type": "object",
+            "description": "Postgres configuration",
+            "properties": {
+                "hostname": {
+                    "type": "string",
+                    "description": "Hostname of the database server"
+                },
+                "database_name": {
+                    "type": "string",
+                    "description": "Name of the database"
+                },
+                "schema": {
+                    "type": "string",
+                    "description": "Name of the Schema used"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "PostgreSQL username"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "PostgreSQL password"
+                }
+            }
+        },        
+        "kafka": {
+            "type": "object",
+            "description": "Kafka configuration",
+            "properties": {
+                "cluster_name": {
+                    "type": "string",
+                    "description": "Name of the Kafka cluster"
+                }
+            }
+        },        
+        "backend_creation": {
+            "type": "object",
+            "description": "Enable the trigger if you want to create the backend service with the above configuration (remember that you need the AMQ Streams Operator installed in your cluster)",
+            "properties": {
+                "postgres": {
+                    "type": "boolean",
+                    "description": "Deploy the Postgres database"
+                },
+                "kafka": {
+                    "type": "boolean",
+                    "description": "Deploy the Kafka Cluster and Topics"
+                }
+            }
+        }
+    }
+}
