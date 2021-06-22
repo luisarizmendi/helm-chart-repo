@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+  namespace: {{ .Values.project_namespace }}
+spec:
+  selector: {}
+  template:
+    metadata:
+      name: init-db
+    spec:
+      containers:
+        - name: init-db
+          env:      
+          - name: PGPASSWORD
+            value: {{ .Values.postgres.password }}
+          image: quay.io/luisarizmendi/postgres-client
+          volumeMounts:
+          - name: pgscript
+            mountPath: "pgscript"
+            readOnly: false
+          command: ["/bin/sh","-c"]
+          args:
+            - cat pgscript/pgscript.sh | /bin/bash
+      volumes:
+        - name: pgscript
+          configMap:
+            name: pg-script
+      restartPolicy: Never
