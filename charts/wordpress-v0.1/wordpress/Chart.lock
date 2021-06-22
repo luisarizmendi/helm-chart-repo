@@ -1,0 +1,12 @@
+dependencies:
+- name: mariadb
+  repository: https://raw.githubusercontent.com/luisarizmendi/helm-chart-repo/master/packages
+  version: 9.3.7
+- name: memcached
+  repository: https://charts.bitnami.com/bitnami
+  version: 5.10.0
+- name: common
+  repository: https://charts.bitnami.com/bitnami
+  version: 1.4.2
+digest: sha256:856ff5f7cabdc7c82d6d8ec062db086ab96dc45d3a15d6e865c8be6affe96cfe
+generated: "2021-04-19T17:03:55.254515538+02:00"

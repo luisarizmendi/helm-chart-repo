@@ -1,0 +1,129 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "properties": {
+        "virtualmachine": {
+            "type": "object",
+            "description": "Defines the Virtual Machine running the DB2 database",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the Virtual Machine."
+                },
+                "userpass": {
+                    "type": "string",
+                    "description": "Password for the db2inst1 user"
+                },
+                "resources": {
+                    "type": "object",
+                    "description": "Virtual Machine resources",
+                    "properties": {
+                        "cores": {
+                            "type": "integer",
+                            "description": "vCores"
+                        },
+                        "memory": {
+                            "type": "string",
+                            "description": "Memory in Gi"
+                        }
+                    }
+                },
+                "storage": {
+                    "type": "object",
+                    "description": "Virtual Machine disks",
+                    "properties": {
+                        "storageclass": {
+                            "type": ["string", "null"],
+                            "description": "StorageClass to be used"
+                        },
+                        "rootdisk": {
+                            "type": "object",
+                            "description": "Disk for the Operating System",
+                            "properties": {
+                                "size": {
+                                    "type": "string",
+                                    "description": "Operating System disk size"
+                                },
+                                "access_mode": {
+                                    "type": "string",
+                                    "description": "Operating System disk access mode (ReadWriteMany for live migration)"
+                                },
+                                "template_pvc": {
+                                    "type": "string",
+                                    "description": "PVC name containing the Operating System disk template"
+                                }
+                            }
+                        },
+                        "datavol": {
+                            "type": "object",
+                            "description": "Disk for the Database data",
+                            "properties": {
+                                "size": {
+                                    "type": "string",
+                                    "description": "Data disk size"
+                                },
+                                "access_mode": {
+                                    "type": "string",
+                                    "description": "Disk access mode (ReadWriteMany for live migration)"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "database": {
+            "type": "object",
+            "description": "Defines the image you want to build/deploy",
+            "properties": {
+                "access": {
+                    "type": "object",
+                    "description": "Database services access",
+                    "properties": {
+                        "console": {
+                            "type": "object",
+                            "description": "Database Console web service",
+                            "properties": {
+                                "published": {
+                                    "type": "boolean",
+                                    "description": "Database console published with a HTTPS route"
+                                }
+                            }
+                        },
+                        "dataservice": {
+                            "type": "object",
+                            "description": "Database service",
+                            "properties": {
+                                "published": {
+                                    "type": "boolean",
+                                    "description": "Database  published with a Nodeport"
+                                },
+                                "nodeport": {
+                                    "type": "integer",
+                                    "description": "Nodeport port number to be used to publish the Database"
+                                }
+                            }
+                        }
+                    }
+                },
+                "data": {
+                    "type": "object",
+                    "description": "Inject contents into the Database",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable/Disable data injection"
+                        },
+                        "database_name": {
+                            "type": "string",
+                            "description": "Name for the new Database"
+                        },
+                        "content_configmap": {
+                            "type": "string",
+                            "description": "Configmap name with the values.sql and tables.sql files"
+                        }
+                    }
+                }               
+            }
+        }
+    }
+ }

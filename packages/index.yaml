@@ -1,0 +1,91 @@
+apiVersion: v1
+entries:
+  db2-vm:
+  - apiVersion: v2
+    appVersion: 11.5.0
+    created: "2021-06-22T13:08:47.276827338+02:00"
+    description: Helm chart for Kubernetes deploying a Virtual Machine with a DB2 Database and Database Console
+    digest: 58c3b716ce5396a100cd9fb9329283633b02b36be284e4ef6234091cf4b7370f
+    home: https://github.com/luisarizmendi/helm-chart-repo
+    icon: https://es.gravatar.com/userimage/76911355/0f2be62871dd62183a504a93a2cbe19a.png
+    keywords:
+    - database
+    - db2
+    maintainers:
+    - name: Luis Arizmendi
+    name: db2-vm
+    urls:
+    - db2-vm-0.1.tgz
+    version: "0.1"
+  mariadb:
+  - annotations:
+      category: Database
+    apiVersion: v2
+    appVersion: 10.5.9
+    created: "2021-06-22T13:08:47.280459969+02:00"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 1.x.x
+    description: Fast, reliable, scalable, and easy to use open-source relational database system. MariaDB Server is intended for mission-critical, heavy-load production systems as well as for embedding into mass-deployed software. Highly available MariaDB cluster.
+    digest: cd200c0ea5bc49a90b73f1d239e35cd844d0ed47da88b2257cf2bb62050f9506
+    home: https://github.com/bitnami/charts/tree/master/bitnami/mariadb
+    icon: https://bitnami.com/assets/stacks/mariadb/img/mariadb-stack-220x234.png
+    keywords:
+    - mariadb
+    - mysql
+    - database
+    - sql
+    - prometheus
+    maintainers:
+    - email: containers@bitnami.com
+      name: Bitnami
+    name: mariadb
+    sources:
+    - https://github.com/bitnami/bitnami-docker-mariadb
+    - https://github.com/prometheus/mysqld_exporter
+    - https://mariadb.org
+    urls:
+    - mariadb-9.3.7.tgz
+    version: 9.3.7
+  wordpress:
+  - apiVersion: v2
+    appVersion: 5.7.1
+    created: "2021-06-22T13:08:47.286504257+02:00"
+    dependencies:
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: https://raw.githubusercontent.com/luisarizmendi/helm-chart-repo/master/packages
+      version: 9.x.x
+    - condition: memcached.enabled
+      name: memcached
+      repository: https://charts.bitnami.com/bitnami
+      version: 5.x.x
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 1.x.x
+    description: Web publishing platform for building blogs and websites.
+    digest: bfc226f41f1e9a8ba2db93460fe4e192fd04dd4379c2e640a9f269be152bb9f6
+    home: https://github.com/luisarizmendi/helm-chart-repo
+    icon: https://es.gravatar.com/userimage/76911355/0f2be62871dd62183a504a93a2cbe19a.png
+    keywords:
+    - application
+    - blog
+    - cms
+    - http
+    - php
+    - web
+    - wordpress
+    maintainers:
+    - name: Luis Arizmendi
+    name: wordpress
+    sources:
+    - https://wordpress.org/
+    urls:
+    - wordpress-10.10.6.tgz
+    version: 10.10.6
+generated: "2021-06-22T13:08:47.276364413+02:00"

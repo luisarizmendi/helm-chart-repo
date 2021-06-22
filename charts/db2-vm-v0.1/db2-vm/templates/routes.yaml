@@ -1,0 +1,17 @@
+{{- if .Values.database.access.console.published }}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: {{ .Values.virtualmachine.name }}-console
+spec:
+  to:
+    kind: Service
+    name: {{ .Values.virtualmachine.name }}-console
+    weight: 100
+  port:
+    targetPort: 11081
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}

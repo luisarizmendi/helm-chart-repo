@@ -1,0 +1,124 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  labels:
+    app: {{ .Values.virtualmachine.name }}
+  name: {{ .Values.virtualmachine.name }}
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        creationTimestamp: null
+        name: {{ .Values.virtualmachine.name }}-rootdisk
+      spec:
+        pvc:
+          accessModes:
+            - {{ .Values.virtualmachine.storage.rootdisk.access_mode }}
+          resources:
+            requests:
+              storage: {{ .Values.virtualmachine.storage.rootdisk.size }}
+          volumeMode: Filesystem
+        source:
+          pvc:
+            name: {{ .Values.virtualmachine.storage.rootdisk.template_pvc }}
+            namespace: openshift-virtualization-os-images
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        creationTimestamp: null
+        name: {{ .Values.virtualmachine.name }}-datavolume
+      spec:
+        pvc:
+          accessModes:
+            - {{ .Values.virtualmachine.storage.datavol.access_mode }}
+          resources:
+            requests:
+              storage: {{ .Values.virtualmachine.storage.datavol.size }}
+          volumeMode: Filesystem
+        source:
+          blank: {}
+  running: true
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: {{ .Values.virtualmachine.name }}
+    spec:
+      domain:
+        cpu:
+          cores: {{ .Values.virtualmachine.resources.cores }}
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - name: rootdisk
+              bootOrder: 1
+              disk:
+                bus: virtio
+            - name: data
+              disk:
+                bus: virtio
+              serial: DATA
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+{{- if .Values.database.data.enabled  }}
+            - disk:
+                bus: virtio
+              name: {{ .Values.virtualmachine.name }}-inject-disk
+              serial: INJECT
+{{- end }}
+          interfaces:
+            - name: default
+              masquerade: {}
+              model: virtio
+          networkInterfaceMultiqueue: true
+          rng: {}
+        ioThreadsPolicy: shared
+        machine:
+          type: pc-q35-rhel8.2.0
+        resources:
+          requests:
+            memory: {{ .Values.virtualmachine.resources.memory }}
+      evictionStrategy: LiveMigrate
+      networks:
+        - name: default
+          pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - dataVolume:
+            name: {{ .Values.virtualmachine.name }}-rootdisk
+          name: rootdisk
+        - dataVolume:
+            name: {{ .Values.virtualmachine.name }}-datavolume
+          name: 'data'
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: db2inst1
+              password: {{ .Values.virtualmachine.userpass }}
+              chpasswd: { expire: False }
+              runcmd:
+                -  runuser -l  db2inst1 -c '/db2home/db2inst1/sqllib/adm/db2stop'
+                -  echo "0 $(hostname) 0" > /db2home/db2inst1/sqllib/db2nodes.cfg
+                -  mkdir /data
+                -  mkfs.ext4 /dev/disk/by-id/virtio-DATA
+                -  mount /dev/disk/by-id/virtio-DATA /data
+                -  mv /db2home/* /data
+                -  umount /data
+                -  mount /dev/disk/by-id/virtio-DATA /db2home
+                -  echo '/dev/disk/by-id/virtio-DATA /db2home ext4 defaults   0   1' >> /etc/fstab
+                -  runuser -l  db2inst1 -c '/db2home/db2inst1/sqllib/adm/db2start'
+{{- if .Values.database.data.enabled  }}
+                -  mkdir /tmp/inject
+                -  mount /dev/disk/by-id/virtio-INJECT /tmp/inject/
+                -  runuser -l  db2inst1 -c 'db2 create database {{ .Values.database.data.database_name }}'
+                -  runuser -l  db2inst1 -c 'db2 activate database {{ .Values.database.data.database_name }}'
+                -  runuser -l  db2inst1 -c 'db2 connect to {{ .Values.database.data.database_name }} user db2inst1 using {{ .Values.virtualmachine.userpass }}; db2 -stvf /tmp/inject/tables.sql ; db2 -stvf /tmp/inject/values.sql'
+{{- end }}
+          name: cloudinitdisk
+{{- if .Values.database.data.enabled  }}
+        - configMap:
+            name: {{ .Values.database.data.content_configmap }}
+          name: {{ .Values.virtualmachine.name }}-inject-disk
+{{- end }}

@@ -1,0 +1,6 @@
+
+A new DB2 database has been started on your Kubernetes cluster.
+
+VM and Database user: db2inst1 ;  password: {{ .Values.virtualmachine.userpass }}
+
+Web Console admin access:   db2inst1 / db2inst1

@@ -1,0 +1,30 @@
+{{- if .Values.database.access.console.published }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.virtualmachine.name }}-console
+spec:
+  ports:
+    - protocol: TCP
+      port: 11081
+      targetPort: 11081
+  selector:
+    kubevirt.io/domain: {{ .Values.virtualmachine.name }}
+{{- end }}
+
+{{- if .Values.database.access.dataservice.published  }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.virtualmachine.name }}-db
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 50000
+      targetPort: 50000
+      nodePort: {{ .Values.database.access.dataservice.nodeport  }}
+  selector:
+    kubevirt.io/domain: {{ .Values.virtualmachine.name }}
+{{- end }}

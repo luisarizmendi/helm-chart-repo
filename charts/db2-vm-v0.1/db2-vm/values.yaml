@@ -1,0 +1,30 @@
+#
+virtualmachine:
+    name: "db2"
+    resources:
+      cores: 2
+      memory: 8Gi
+    userpass: "redhat"
+    storage:
+      storageclass: ""
+      rootdisk:
+        size: 40Gi
+        access_mode: "ReadWriteMany"
+        template_pvc: "db2"
+      datavol:
+        size: 5Gi
+        access_mode: "ReadWriteMany"
+
+
+database:
+    data:
+      enabled: false
+      database_name: "newdb"
+      content_configmap: "db-inject"
+
+    access:
+        console:
+            published: true
+        dataservice:
+            published: false
+            nodeport: 30500
