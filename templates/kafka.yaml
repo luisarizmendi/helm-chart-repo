@@ -3,7 +3,7 @@ apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
   name: {{ .Values.kafka.cluster_name }}
-  namespace: {{ .Values.project_namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     helm.sh/hook: pre-install
 spec:

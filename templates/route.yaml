@@ -2,14 +2,14 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: analysis-gateway
-  namespace: {{ .Values.project_namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: analysis-gateway
     app.kubernetes.io/managed-by: Helm
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
 spec:
-  host: analysis-gateway-{{ .Values.project_namespace }}.apps.{{ .Values.domain }}
+  host: {{ .Release.Name }}-{{ .Release.Namespace }}.apps.{{ .Values.domain }}
   to:
     kind: Service
     name: analysis-gateway
@@ -24,7 +24,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: pgweb
-  namespace: {{ .Values.project_namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: pgweb
     app.kubernetes.io/component: pgweb
@@ -52,7 +52,7 @@ metadata:
   labels:
     app: kafdrop
   name: kafdrop
-  namespace: {{ .Values.project_namespace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   port:
     targetPort: 9000-tcp
