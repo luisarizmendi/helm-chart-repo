@@ -3,9 +3,9 @@ entries:
   analysis:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-07-07T16:43:35.622599598+02:00"
+    created: "2021-07-07T16:47:57.326365787+02:00"
     description: A Helm chart for OpenShift to deploy the Automated Analysis demo APP
-    digest: effef0ed168ef614c7afa5179d8a496c6a47d679bccf0a510adb96c41f12a5b6
+    digest: c1957cf249a3488c8892f8d8d81936acebda314f7e5b060c1032eac8261d39f9
     home: https://github.com/luisarizmendi/helm-chart-repo
     icon: https://es.gravatar.com/userimage/76911355/0f2be62871dd62183a504a93a2cbe19a.png
     keywords:
@@ -21,9 +21,9 @@ entries:
   db2-vm:
   - apiVersion: v2
     appVersion: 11.5.0
-    created: "2021-07-07T16:43:35.622998404+02:00"
+    created: "2021-07-07T16:47:57.326743735+02:00"
     description: Helm chart for Kubernetes deploying a Virtual Machine with a DB2 Database and Database Console
-    digest: 4afce13ddaff34698a466bf29a472ac58af79f55ebad78f995b83b900daabc0e
+    digest: e8904dc2f1646562c52fd4edecc5e2dd89c7a57a4a1b44160ac07bb19dd5f8f9
     home: https://github.com/luisarizmendi/helm-chart-repo
     icon: https://es.gravatar.com/userimage/76911355/0f2be62871dd62183a504a93a2cbe19a.png
     keywords:
@@ -40,7 +40,7 @@ entries:
       category: Database
     apiVersion: v2
     appVersion: 10.5.9
-    created: "2021-07-07T16:43:35.625255007+02:00"
+    created: "2021-07-07T16:47:57.328949657+02:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -48,7 +48,7 @@ entries:
       - bitnami-common
       version: 1.x.x
     description: Fast, reliable, scalable, and easy to use open-source relational database system. MariaDB Server is intended for mission-critical, heavy-load production systems as well as for embedding into mass-deployed software. Highly available MariaDB cluster.
-    digest: 572c6092f7e39acaf085fa20b69b9a6d8cdd28ef7e331a4fbb3c1dae068f1b89
+    digest: c13cd3d06bfa614036aeac857d130e708d76846046b9f3493f16d4223db7b4d9
     home: https://github.com/bitnami/charts/tree/master/bitnami/mariadb
     icon: https://bitnami.com/assets/stacks/mariadb/img/mariadb-stack-220x234.png
     keywords:
@@ -71,7 +71,7 @@ entries:
   wordpress:
   - apiVersion: v2
     appVersion: 5.7.1
-    created: "2021-07-07T16:43:35.631575685+02:00"
+    created: "2021-07-07T16:47:57.335425274+02:00"
     dependencies:
     - condition: mariadb.enabled
       name: mariadb
@@ -87,7 +87,7 @@ entries:
       - bitnami-common
       version: 1.x.x
     description: Web publishing platform for building blogs and websites.
-    digest: a207a5f4848ef8d51b30891dafbcb15e7f3cc43610efbcf903ca250965d14027
+    digest: 3346fc1e44ffcf829d56aa0457bb1133cd0607a4c815a95238476a17e5567d6c
     home: https://github.com/luisarizmendi/helm-chart-repo
     icon: https://es.gravatar.com/userimage/76911355/0f2be62871dd62183a504a93a2cbe19a.png
     keywords:
@@ -106,4 +106,4 @@ entries:
     urls:
     - wordpress-10.10.6.tgz
     version: 10.10.6
-generated: "2021-07-07T16:43:35.621915115+02:00"
+generated: "2021-07-07T16:47:57.325662086+02:00"
