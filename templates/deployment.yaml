@@ -89,7 +89,7 @@ spec:
             sleep 10
           done
 
-          oc -n {{ .Release.Namespace }} set env deployment/analysis-gateway STREAM_URL=http://${URL}
+          oc -n {{ .Release.Namespace }} set env deployment/analysis-gateway STREAM_URL=http://${URL}/dashboard/stream
 
 
         image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
