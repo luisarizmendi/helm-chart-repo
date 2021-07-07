@@ -3,7 +3,7 @@ kind: DeploymentConfig
 apiVersion: apps.openshift.io/v1
 metadata:
   name: analysis-events-kafdrop
-  namespace:  {{ .Values.project_namespace }}
+  namespace:  {{ .Release.Namespace }}
   annotations:
     app.openshift.io/connects-to: >-
       [{"apiVersion":"apps/v1","kind":"StatefulSet","name":"{{ .Values.kafka.cluster_name }}-kafka"}]

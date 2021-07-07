@@ -27,7 +27,7 @@ spec:
         app.openshift.io/runtime: quarkus
         app.kubernetes.io/part-of: analysis
         analysis: ""
-        app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+        app.openshift.io/runtime-namespace: {{ .Release.Namespace }}
     spec:
       containers:
         - name: analysis-gateway
@@ -40,7 +40,7 @@ spec:
             - name: KAFKA_BOOTSTRAP_URLS
               value: {{ .Values.kafka.cluster_name }}-kafka-bootstrap:9092
             - name: STREAM_URL
-              value:  http://analysis-gateway-{{ .Values.project_namespace }}.apps.{{ .Values.domain }}/dashboard/stream
+              value:  http://{{ .Release.Name }}-{{ .Release.Namespace }}.apps.{{ .Values.domain }}/dashboard/stream
 
 
 ---
@@ -73,7 +73,7 @@ spec:
         app.openshift.io/runtime: quarkus
         app.kubernetes.io/part-of: analysis
         analysis: ""
-        app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+        app.openshift.io/runtime-namespace: {{ .Release.Namespace }}
     spec:
       containers:
         - name: analysis-core
@@ -121,7 +121,7 @@ spec:
         app.openshift.io/runtime: quarkus
         app.kubernetes.io/part-of: analysis
         analysis: ""
-        app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+        app.openshift.io/runtime-namespace: {{ .Release.Namespace }}
     spec:
       containers:
         - name: analysis-process-regular
@@ -164,7 +164,7 @@ spec:
         app.openshift.io/runtime: quarkus
         app.kubernetes.io/part-of: analysis
         analysis: ""
-        app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+        app.openshift.io/runtime-namespace: {{ .Release.Namespace }}
     spec:
       containers:
         - name: analysis-process-virus
@@ -186,14 +186,14 @@ metadata:
     app.openshift.io/connects-to: >-
       [{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"{{ .Values.postgres.database_name }}"}]
   name: pgweb
-  namespace: {{ .Values.project_namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: pgweb
     app.kubernetes.io/component: pgweb
     app.kubernetes.io/instance: pgweb
     app.kubernetes.io/part-of: analysis
     app.openshift.io/runtime: postgresql
-    app.openshift.io/runtime-namespace: {{ .Values.project_namespace }}
+    app.openshift.io/runtime-namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:

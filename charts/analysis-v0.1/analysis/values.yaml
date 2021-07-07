@@ -3,7 +3,6 @@
 # Declare variables to be passed into your templates.
 
 # Quarkus Cafe Application Variables
-project_namespace: analysis-demo
 domain: ocp4.example.com
 version:
   regular:  "1.0"
@@ -28,8 +27,8 @@ postgres:
 
 
 backend_creation:
-  postgres: false
-  kafka: false
+  postgres: true
+  kafka: true
 
 quarkus_log_level: INFO
 analysis_log_level: DEBUG

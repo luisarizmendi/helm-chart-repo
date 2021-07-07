@@ -136,11 +136,11 @@ items:
 kind: List
 metadata:
   name: postgres-persistent
-  namespace: {{ .Values.project_namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     helm.sh/hook: pre-install
     meta.helm.sh/release-name: analysis
-    meta.helm.sh/release-namespace: {{ .Values.project_namespace }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
   labels:
     app: {{ .Values.postgres.database_name }}
     app.kubernetes.io/managed-by: Helm

@@ -5,7 +5,7 @@ metadata:
   name: regularprocess-in
   labels:
     strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
-  namespace:  {{ .Values.project_namespace }}
+  namespace:  {{ .Release.Namespace }}
 spec:
   partitions: 10
   replicas: 3
@@ -19,7 +19,7 @@ metadata:
   name: virusprocess-in
   labels:
     strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
-  namespace:  {{ .Values.project_namespace }}
+  namespace:  {{ .Release.Namespace }}
 spec:
   partitions: 10
   replicas: 3
@@ -33,7 +33,7 @@ metadata:
   name: orders-in
   labels:
     strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
-  namespace:  {{ .Values.project_namespace }}
+  namespace:  {{ .Release.Namespace }}
 spec:
   partitions: 10
   replicas: 3
@@ -47,7 +47,7 @@ metadata:
   name: orders-out
   labels:
     strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
-  namespace:  {{ .Values.project_namespace }}
+  namespace:  {{ .Release.Namespace }}
 spec:
   partitions: 10
   replicas: 3
@@ -61,7 +61,7 @@ metadata:
   name: web-updates
   labels:
     strimzi.io/cluster: {{ .Values.kafka.cluster_name }}
-  namespace:  {{ .Values.project_namespace }}
+  namespace:  {{ .Release.Namespace }}
 spec:
   partitions: 10
   replicas: 3
