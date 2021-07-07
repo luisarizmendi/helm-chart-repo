@@ -429,17 +429,15 @@ Below is a table of each value used to configure this chart.
 
 | Value | Description | Default | Additional Information |
 | ----- | ----------- | ------- | ---------------------- |
-| `project_namespace` | Namespace where to deploy the app | analysis-demo | - |
-| `domain` | OpenShift cluster domain | ocp4.example.com | - |
 | `registry` | Registry where the container images are located | quay.io/analysis | - |
 | `kafka.cluster_name` | Name of the Kafka cluster | analysis-cluster | - |
-| `kafka.create` | Create kafka resources | false | - |
+| `kafka.create` | Create kafka resources | true | - |
 | `postgres.hostname` | Hostname of the database server | analysisdb | - |
 | `postgres.database_name` | Name of the database | analysisdb | - |
 | `postgres.schema` | Name of the Schema used | analysis | - |
 | `postgres.username` | PostgreSQL username | analysisadmin | - |
 | `postgres.password` | PostgreSQL password | analysispassword | - |
-| `postgres.create` | Create Postgres database | false | - |
+| `postgres.create` | Create Postgres database | true | - |
 
 
 ## About the APP
