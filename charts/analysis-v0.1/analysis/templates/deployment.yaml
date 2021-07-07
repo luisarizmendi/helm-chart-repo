@@ -44,6 +44,67 @@ spec:
 
 
 ---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: occli
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: occli-permission
+subjects:
+  - kind: ServiceAccount
+    name: occli
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+
+---
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: ${STORAGE_NAMESPACE}
+  name: streamurl-patch
+spec:
+  activeDeadlineSeconds: 400
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -x
+        - -c
+        - |   
+          URL=""
+          while [ "$URL" == "" ]
+          do
+            URL=$(oc get route -n {{ .Release.Namespace }} analysis-gateway -o yaml | grep host: | awk '{print $2}' | tail -n 1)
+            sleep 10
+          done
+
+          oc -n {{ .Release.Namespace }} set env deployment/analysis-gateway STREAM_URL=${URL}
+
+
+        image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+        name: streamurl-patch-job
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Never
+      serviceAccountName: occli
+
+
+
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
