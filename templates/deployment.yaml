@@ -69,7 +69,6 @@ roleRef:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  namespace: ${STORAGE_NAMESPACE}
   name: streamurl-patch
 spec:
   activeDeadlineSeconds: 400
