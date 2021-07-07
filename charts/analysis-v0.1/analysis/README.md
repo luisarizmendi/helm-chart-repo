@@ -17,11 +17,10 @@ spec:
 
 ## Prerequisites
 Below are prerequisites:
-- Namespace where the APP will be deployed (ie. analysis-demo)
 - PostgreSQL Database
 - Kafka Cluster
 
-This Helm chart is able to deploy a postgres database server using the Postgres OpenShift template and the Kafka cluster by using the AMQ Streams Operator (which must be installed previously since it's not instaled by this Chart), but be aware that this option is not selected by default.
+This Helm chart is able to deploy a postgres database server using the Postgres OpenShift template and the Kafka cluster by using the AMQ Streams Operator (which must be installed previously since it's not instaled by this Chart).
 
 You can also create those backend services by your own:
 
