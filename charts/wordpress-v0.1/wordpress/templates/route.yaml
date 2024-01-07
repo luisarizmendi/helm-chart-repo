@@ -1,0 +1,15 @@
+{{- if .Values.route.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Route
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: {{ include "common.names.fullname" . }}
+    weight: 100
+  wildcardPolicy: None
+{{- end }}
