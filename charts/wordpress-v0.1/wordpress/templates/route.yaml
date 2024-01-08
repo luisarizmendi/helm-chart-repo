@@ -1,5 +1,5 @@
 {{- if .Values.route.enabled }}
-apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: {{ include "common.names.fullname" . }}
