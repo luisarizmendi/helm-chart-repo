@@ -3,9 +3,10 @@ entries:
   analysis:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-07-07T16:47:57.326365787+02:00"
-    description: A Helm chart for OpenShift to deploy the Automated Analysis demo APP
-    digest: c1957cf249a3488c8892f8d8d81936acebda314f7e5b060c1032eac8261d39f9
+    created: "2024-01-08T01:01:44.039820794+01:00"
+    description: A Helm chart for OpenShift to deploy the Automated Analysis demo
+      APP
+    digest: 6633c1d81fc7ea3de83a7ad83bb7645e2b07b7ec9a0cdf5fcdd5188b236fb322
     home: https://github.com/luisarizmendi/helm-chart-repo
     icon: https://es.gravatar.com/userimage/76911355/0f2be62871dd62183a504a93a2cbe19a.png
     keywords:
@@ -21,9 +22,10 @@ entries:
   db2-vm:
   - apiVersion: v2
     appVersion: 11.5.0
-    created: "2021-07-07T16:47:57.326743735+02:00"
-    description: Helm chart for Kubernetes deploying a Virtual Machine with a DB2 Database and Database Console
-    digest: e8904dc2f1646562c52fd4edecc5e2dd89c7a57a4a1b44160ac07bb19dd5f8f9
+    created: "2024-01-08T01:01:44.040176184+01:00"
+    description: Helm chart for Kubernetes deploying a Virtual Machine with a DB2
+      Database and Database Console
+    digest: 64fbf94a5bbfd2d1d719f19da81452c451270c6152253678b7e8a69e06243e8b
     home: https://github.com/luisarizmendi/helm-chart-repo
     icon: https://es.gravatar.com/userimage/76911355/0f2be62871dd62183a504a93a2cbe19a.png
     keywords:
@@ -40,15 +42,18 @@ entries:
       category: Database
     apiVersion: v2
     appVersion: 10.5.9
-    created: "2021-07-07T16:47:57.328949657+02:00"
+    created: "2024-01-08T01:01:44.04238069+01:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
       tags:
       - bitnami-common
       version: 1.x.x
-    description: Fast, reliable, scalable, and easy to use open-source relational database system. MariaDB Server is intended for mission-critical, heavy-load production systems as well as for embedding into mass-deployed software. Highly available MariaDB cluster.
-    digest: c13cd3d06bfa614036aeac857d130e708d76846046b9f3493f16d4223db7b4d9
+    description: Fast, reliable, scalable, and easy to use open-source relational
+      database system. MariaDB Server is intended for mission-critical, heavy-load
+      production systems as well as for embedding into mass-deployed software. Highly
+      available MariaDB cluster.
+    digest: 3a9d52343340e1ff2d041c4a27852f89fb5febeb446cd311ea24bd06bc76a776
     home: https://github.com/bitnami/charts/tree/master/bitnami/mariadb
     icon: https://bitnami.com/assets/stacks/mariadb/img/mariadb-stack-220x234.png
     keywords:
@@ -71,7 +76,7 @@ entries:
   wordpress:
   - apiVersion: v2
     appVersion: 5.7.1
-    created: "2021-07-07T16:47:57.335425274+02:00"
+    created: "2024-01-08T01:01:44.048392079+01:00"
     dependencies:
     - condition: mariadb.enabled
       name: mariadb
@@ -87,7 +92,7 @@ entries:
       - bitnami-common
       version: 1.x.x
     description: Web publishing platform for building blogs and websites.
-    digest: 3346fc1e44ffcf829d56aa0457bb1133cd0607a4c815a95238476a17e5567d6c
+    digest: 3be44d1e58cc3df5cfbdde8e23af4062bd343ec9d1226b874c908eaaa7f21db9
     home: https://github.com/luisarizmendi/helm-chart-repo
     icon: https://es.gravatar.com/userimage/76911355/0f2be62871dd62183a504a93a2cbe19a.png
     keywords:
@@ -106,4 +111,4 @@ entries:
     urls:
     - wordpress-10.10.6.tgz
     version: 10.10.6
-generated: "2021-07-07T16:47:57.325662086+02:00"
+generated: "2024-01-08T01:01:44.039156709+01:00"
