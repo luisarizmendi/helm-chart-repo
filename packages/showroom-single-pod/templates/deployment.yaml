@@ -1,0 +1,195 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+    spec:
+      strategy:
+        type: Recreate
+      serviceAccountName: {{ .Release.Name }}
+      containers:
+      - name: nginx
+        image: {{ .Values.proxy.image }}
+        imagePullPolicy: {{ .Values.proxy.imagePullPolicy }}
+        volumeMounts:
+        - mountPath: /etc/nginx/nginx.conf
+          name: nginx-config
+          subPath: nginx.conf
+        - mountPath: /data/www
+          name: content
+        - mountPath: /var/cache/nginx
+          name: nginx-cache
+        - mountPath: /var/run
+          name: nginx-pid
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        ports:
+        - name: web
+          containerPort: 8080
+
+      - name: content
+        image: {{ .Values.content.image }}
+        imagePullPolicy: {{ .Values.content.imagePullPolicy }}
+        env:
+        - name: GIT_REPO_URL
+          value: {{ .Values.content.repoUrl }}
+        - name: GIT_REPO_REF
+          value: {{ .Values.content.repoRef }}
+        - name: ANTORA_PLAYBOOK
+          value: {{ .Values.content.antoraPlaybook }}
+        volumeMounts:
+        - name: user-data
+          mountPath: /user_data/
+        - name: showroom
+          mountPath: /showroom/
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+
+{{- if eq .Values.terminal.setup "true" }}
+      - name: terminal
+        image: {{ .Values.terminal.image }}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: GUID
+          value: "{{ .Values.guid }}"
+        volumeMounts:
+        - name: terminal-lab-user-home
+          mountPath: /home/lab-user
+        ports:
+        - containerPort: {{ .Values.terminal.port }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.terminal.resources | nindent 10 }}
+{{- end }}
+{{- if eq .Values.ocpconsole.setup "true" }}
+      - name: console-app
+        image: "quay.io/openshift/origin-console:4.14"
+        env:
+          - name: BRIDGE_BRANDING
+            value: openshift
+          - name: BRIDGE_USER_AUTH
+            value: disabled
+          - name: BRIDGE_K8S_MODE
+            value: off-cluster
+          - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
+            value: https://kubernetes.default
+          - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
+            value: "true"
+          - name: BRIDGE_K8S_AUTH
+            value: bearer-token
+          - name: BRIDGE_BASE_PATH
+            value: "/console/"
+          - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: console-secret
+                key: token
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /console/
+            port: 9000
+        readinessProbe:
+          httpGet:
+            path: /console/
+            port: 9000
+{{- end }}
+
+{{- if eq .Values.wetty.setup "true" }}
+      - name: wetty
+        image: {{ .Values.wetty.image }}
+        imagePullPolicy: IfNotPresent
+        args:
+        - --base="/{{ .Values.wetty.base }}/"
+        - --port={{ .Values.wetty.port }}
+{{-   if eq .Values.wetty.ssh.autoSshToBastion "true" }}
+        - --ssh-host={{ .Values.wetty.ssh.sshHost }}
+        - --ssh-port={{ .Values.wetty.ssh.sshPort }}
+        - --ssh-user={{ .Values.wetty.ssh.sshUser }}
+        - --ssh-auth={{ .Values.wetty.ssh.sshAuth }}
+        - --ssh-pass={{ .Values.wetty.ssh.sshPass }}
+{{-   end }}
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: GUID
+          value: "{{ .Values.guid }}"
+        ports:
+        - containerPort: {{ .Values.wetty.port }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.wetty.resources | nindent 10 }}
+{{- end }}
+
+{{- if eq .Values.novnc.setup "true" }}
+      - name: novnc
+        image: {{ .Values.novnc.image }}
+        imagePullPolicy: IfNotPresent
+        args:
+        - websockify
+        - --web=/www
+        - 127.0.0.1:{{ .Values.novnc.port }}
+        - "{{ .Values.novnc.vncServer }}"
+        ports:
+        - containerPort: {{ .Values.novnc.port }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.novnc.resources | nindent 10 }}
+{{- end }}
+
+      volumes:
+      - name: showroom
+        emptyDir: {}
+      - name: user-data
+        configMap:
+          name: {{ .Release.Name }}-userdata
+      - name: content
+        configMap:
+          name: {{ .Release.Name }}-index
+      - name: nginx-config
+        configMap:
+          defaultMode: 420
+          name: {{ .Release.Name }}-proxy-config
+      - name: nginx-pid
+        emptyDir: {}
+      - name: nginx-cache
+        emptyDir: {}
+{{- if eq .Values.terminal.setup "true" }}
+      - name: terminal-lab-user-home
+{{-   if eq .Values.terminal.storage.setup "true" }}
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-terminal-lab-user-home
+{{-   else }}
+        emptyDir: {}
+{{-   end }}
+{{- end }}
